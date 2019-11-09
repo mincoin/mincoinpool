@@ -178,7 +178,7 @@ class Node(object):
         stop_signal = variable.Event()
         self.stop = stop_signal.happened
         
-        # BITCOIND WORK
+        # MINCOIND WORK
         
         self.bitcoind_work = variable.Variable((yield helper.getwork(self.bitcoind)))
         @defer.inlineCallbacks
@@ -236,7 +236,7 @@ class Node(object):
         self.bitcoind_work.changed.watch(lambda _: self.set_best_share())
         self.set_best_share()
         
-        # setup p2p logic and join p2pool network
+        # setup p2p logic and join mincoinpool network
         
         # update mining_txs according to getwork results
         @self.bitcoind_work.changed.run_and_watch
@@ -248,13 +248,13 @@ class Node(object):
                 new_known_txs[tx_hash] = tx
             self.mining_txs_var.set(new_mining_txs)
             self.known_txs_var.set(new_known_txs)
-        # add p2p transactions from bitcoind to known_txs
+        # add p2p transactions from mincoind to known_txs
         @self.factory.new_tx.watch
         def _(tx):
             new_known_txs = dict(self.known_txs_var.value)
             new_known_txs[bitcoin_data.hash256(bitcoin_data.tx_type.pack(tx))] = tx
             self.known_txs_var.set(new_known_txs)
-        # forward transactions seen to bitcoind
+        # forward transactions seen to mincoind
         @self.known_txs_var.transitioned.watch
         @defer.inlineCallbacks
         def _(before, after):
@@ -271,11 +271,11 @@ class Node(object):
             
             block = share.as_block(self.tracker, self.known_txs_var.value)
             if block is None:
-                print >>sys.stderr, 'GOT INCOMPLETE BLOCK FROM PEER! %s bitcoin: %s%064x' % (p2pool_data.format_hash(share.hash), self.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, share.header_hash)
+                print >>sys.stderr, 'GOT INCOMPLETE BLOCK FROM PEER! %s mincoin: %s%064x' % (p2pool_data.format_hash(share.hash), self.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, share.header_hash)
                 return
             helper.submit_block(block, True, self.factory, self.bitcoind, self.bitcoind_work, self.net)
             print
-            print 'GOT BLOCK FROM PEER! Passing to bitcoind! %s bitcoin: %s%064x' % (p2pool_data.format_hash(share.hash), self.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, share.header_hash)
+            print 'GOT BLOCK FROM PEER! Passing to mincoind! %s mincoin: %s%064x' % (p2pool_data.format_hash(share.hash), self.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, share.header_hash)
             print
         
         def forget_old_txs():

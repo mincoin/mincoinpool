@@ -55,7 +55,7 @@ class WorkerInterface(object):
     def _getwork(self, request, data, long_poll):
         request.setHeader('X-Long-Polling', '/long-polling')
         request.setHeader('X-Roll-NTime', 'expire=100')
-        request.setHeader('X-Is-P2Pool', 'true')
+        request.setHeader('X-Is-MincoinPool', 'true')
         if request.getHeader('Host') is not None:
             request.setHeader('X-Stratum', 'stratum+tcp://' + request.getHeader('Host'))
         

@@ -30,10 +30,10 @@ try:
     sys.argv[1:] = ['py2exe']
     setup(name='p2pool',
         version=version,
-        description='Peer-to-peer Bitcoin mining pool',
-        author='Forrest Voight',
-        author_email='forrest@forre.st',
-        url='http://p2pool.forre.st/',
+        description='Peer-to-peer Mincoin Mining Pool',
+        author='Xi Eta',
+        author_email='xieta@mincointools.com',
+        url='http://www.mincoinpool.org/',
         data_files=[
             ('', ['README.md']),
             ("Microsoft.VC90.MFC", mfcfiles),
@@ -46,7 +46,7 @@ try:
             ]),
         ],
 
-        console=['run_p2pool.py'],
+        console=['run_mincoinpool.py'],
         options=dict(py2exe=dict(
             bundle_files=bundle,
             dll_excludes=['w9xpopen.exe', "mswsock.dll", "MSWSOCK.dll"],

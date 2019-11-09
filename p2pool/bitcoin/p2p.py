@@ -1,5 +1,5 @@
 '''
-Implementation of Bitcoin's p2p protocol
+Implementation of Mincoin's p2p protocol
 '''
 
 import random
@@ -32,7 +32,7 @@ class Protocol(p2protocol.Protocol):
                 port=self.transport.getHost().port,
             ),
             nonce=random.randrange(2**64),
-            sub_version_num='/P2Pool:%s/' % (p2pool.__version__,),
+            sub_version_num='/MincoinPool:%s/' % (p2pool.__version__,),
             start_height=0,
         )
     
@@ -163,7 +163,7 @@ class Protocol(p2protocol.Protocol):
         if hasattr(self, 'pinger'):
             self.pinger.stop()
         if p2pool.DEBUG:
-            print >>sys.stderr, 'Bitcoin connection lost. Reason:', reason.getErrorMessage()
+            print >>sys.stderr, 'Mincoin connection lost. Reason:', reason.getErrorMessage()
 
 class ClientFactory(protocol.ReconnectingClientFactory):
     protocol = Protocol

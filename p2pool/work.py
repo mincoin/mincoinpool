@@ -155,7 +155,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
             return
         self.address_throttle=time.time()
         print "ATTEMPTING TO FRESHEN ADDRESS."
-        self.address = yield deferral.retry('Error getting a dynamic address from bitcoind:', 5)(lambda: self.bitcoind.rpc_getnewaddress('p2pool'))()
+        self.address = yield deferral.retry('Error getting a dynamic address from mincoind:', 5)(lambda: self.bitcoind.rpc_getnewaddress('mincoinpool'))()
         new_pubkey = bitcoin_data.address_to_pubkey_hash(self.address, self.net)
         self.pubkeys.popleft()
         self.pubkeys.addkey(new_pubkey)
@@ -208,9 +208,9 @@ class WorkerBridge(worker_interface.WorkerBridge):
     
     def preprocess_request(self, user):
         if (self.node.p2p_node is None or len(self.node.p2p_node.peers) == 0) and self.node.net.PERSIST:
-            raise jsonrpc.Error_for_code(-12345)(u'p2pool is not connected to any peers')
+            raise jsonrpc.Error_for_code(-12345)(u'mincoinpool is not connected to any peers')
         if time.time() > self.current_work.value['last_update'] + 60:
-            raise jsonrpc.Error_for_code(-12345)(u'lost contact with bitcoind')
+            raise jsonrpc.Error_for_code(-12345)(u'lost contact with mincoind')
         user, pubkey_hash, desired_share_target, desired_pseudoshare_target = self.get_user_details(user)
         return pubkey_hash, desired_share_target, desired_pseudoshare_target
     
@@ -241,9 +241,9 @@ class WorkerBridge(worker_interface.WorkerBridge):
     def get_work(self, pubkey_hash, desired_share_target, desired_pseudoshare_target):
         global print_throttle
         if (self.node.p2p_node is None or len(self.node.p2p_node.peers) == 0) and self.node.net.PERSIST:
-            raise jsonrpc.Error_for_code(-12345)(u'p2pool is not connected to any peers')
+            raise jsonrpc.Error_for_code(-12345)(u'mincoinpool is not connected to any peers')
         if self.node.best_share_var.value is None and self.node.net.PERSIST:
-            raise jsonrpc.Error_for_code(-12345)(u'p2pool is downloading shares')
+            raise jsonrpc.Error_for_code(-12345)(u'mincoinpool is downloading shares')
         if set(r[1:] if r.startswith('!') else r for r in self.node.bitcoind_work.value['rules']) - set(getattr(self.node.net, 'SOFTFORKS_REQUIRED', [])):
             raise jsonrpc.Error_for_code(-12345)(u'unknown rule activated')
         
@@ -400,7 +400,7 @@ class WorkerBridge(worker_interface.WorkerBridge):
                     helper.submit_block(dict(header=header, txs=[new_gentx] + other_transactions), False, self.node.factory, self.node.bitcoind, self.node.bitcoind_work, self.node.net)
                     if pow_hash <= header['bits'].target:
                         print
-                        print 'GOT BLOCK FROM MINER! Passing to bitcoind! %s%064x' % (self.node.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, header_hash)
+                        print 'GOT BLOCK FROM MINER! Passing to mincoind! %s%064x' % (self.node.net.PARENT.BLOCK_EXPLORER_URL_PREFIX, header_hash)
                         print
             except:
                 log.err(None, 'Error while processing potential block:')

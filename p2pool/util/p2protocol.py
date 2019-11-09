@@ -1,5 +1,5 @@
 '''
-Generic message-based protocol used by Bitcoin and P2Pool for P2P communication
+Generic message-based protocol used by Mincoin and MincoinPool for P2P communication
 '''
 
 import hashlib

@@ -7,11 +7,11 @@ import p2pool
 from p2pool.bitcoin import data as bitcoin_data
 from p2pool.util import deferral, jsonrpc
 
-@deferral.retry('Error while checking Bitcoin connection:', 1)
+@deferral.retry('Error while checking Mincoin connection:', 1)
 @defer.inlineCallbacks
 def check(bitcoind, net):
     if not (yield net.PARENT.RPC_CHECK(bitcoind)):
-        print >>sys.stderr, "    Check failed! Make sure that you're connected to the right bitcoind with --bitcoind-rpc-port!"
+        print >>sys.stderr, "    Check failed! Make sure that you're connected to the right mincoind with --mincoind-rpc-port!"
         raise deferral.RetrySilentlyException()
     
     version_check_result = net.VERSION_CHECK((yield bitcoind.rpc_getnetworkinfo())['version'])
@@ -34,7 +34,7 @@ def check(bitcoind, net):
         print 'Coin daemon too old! Upgrade!'
         raise deferral.RetrySilentlyException()
 
-@deferral.retry('Error getting work from bitcoind:', 3)
+@deferral.retry('Error getting work from mincoind:', 3)
 @defer.inlineCallbacks
 def getwork(bitcoind, use_getblocktemplate=False):
     def go():
@@ -53,7 +53,7 @@ def getwork(bitcoind, use_getblocktemplate=False):
             work = yield go()
             end = time.time()
         except jsonrpc.Error_for_code(-32601): # Method not found
-            print >>sys.stderr, 'Error: Bitcoin version too old! Upgrade to v0.5 or newer!'
+            print >>sys.stderr, 'Error: Mincoin version too old! Upgrade to v0.5 or newer!'
             raise deferral.RetrySilentlyException()
     packed_transactions = [x['data'].decode('hex') for x in work['transactions'] if len(x.get('depends', [])) == 0]
     if 'height' not in work:
@@ -80,7 +80,7 @@ def getwork(bitcoind, use_getblocktemplate=False):
 @deferral.retry('Error submitting primary block: (will retry)', 10, 10)
 def submit_block_p2p(block, factory, net):
     if factory.conn.value is None:
-        print >>sys.stderr, 'No bitcoind connection when block submittal attempted! %s%064x' % (net.PARENT.BLOCK_EXPLORER_URL_PREFIX, bitcoin_data.hash256(bitcoin_data.block_header_type.pack(block['header'])))
+        print >>sys.stderr, 'No mincoind connection when block submittal attempted! %s%064x' % (net.PARENT.BLOCK_EXPLORER_URL_PREFIX, bitcoin_data.hash256(bitcoin_data.block_header_type.pack(block['header'])))
         raise deferral.RetrySilentlyException()
     factory.conn.value.send_block(block=block)
 

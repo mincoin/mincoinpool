@@ -63,7 +63,7 @@ def is_segwit_activated(version, net):
     segwit_activation_version = getattr(net, 'SEGWIT_ACTIVATION_VERSION', 0)
     return version >= segwit_activation_version and segwit_activation_version > 0
 
-DONATION_SCRIPT = '4104ffd03de44a6e11b9917f3a29f9443283d9871c9d743ef30d5eddcd37094b64d1b3d8090496b53256786bf5c82932ec23c3b74d9f05a6f95a8b5529352656664bac'.decode('hex')
+DONATION_SCRIPT = '410437a6063714168fa3f4ff2d30c1653aee66e3a4772a66abbc85c2341fb8d56ad46dacfaacb6251a2cbfdd81faa9c5d751f653f81506ee9cb0d67983403cfa8574ac'.decode('hex')
 
 class BaseShare(object):
     VERSION = 0
@@ -685,19 +685,19 @@ def get_warnings(tracker, best_share, net, bitcoind_getinfo, bitcoind_work_value
     majority_desired_version = max(desired_version_counts, key=lambda k: desired_version_counts[k])
     if majority_desired_version > (Share.SUCCESSOR if Share.SUCCESSOR is not None else Share).VOTING_VERSION and desired_version_counts[majority_desired_version] > sum(desired_version_counts.itervalues())/2:
         res.append('A MAJORITY OF SHARES CONTAIN A VOTE FOR AN UNSUPPORTED SHARE IMPLEMENTATION! (v%i with %i%% support)\n'
-            'An upgrade is likely necessary. Check http://p2pool.forre.st/ for more information.' % (
+            'An upgrade is likely necessary. Check http://www.mincoinpool.org/ for more information.' % (
                 majority_desired_version, 100*desired_version_counts[majority_desired_version]/sum(desired_version_counts.itervalues())))
     
     if bitcoind_getinfo['warnings'] != '':
         if 'This is a pre-release test build' not in bitcoind_getinfo['warnings']:
-            res.append('(from bitcoind) %s' % (bitcoind_getinfo['warnings'],))
+            res.append('(from mincoind) %s' % (bitcoind_getinfo['warnings'],))
     
     version_warning = getattr(net, 'VERSION_WARNING', lambda v: None)(bitcoind_getinfo['version'])
     if version_warning is not None:
         res.append(version_warning)
     
     if time.time() > bitcoind_work_value['last_update'] + 60:
-        res.append('''LOST CONTACT WITH BITCOIND for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
+        res.append('''LOST CONTACT WITH MINCOIND for %s! Check that it isn't frozen or dead!''' % (math.format_dt(time.time() - bitcoind_work_value['last_update']),))
     
     return res
 
