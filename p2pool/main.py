@@ -460,8 +460,8 @@ def run():
         help='number of mincoin auto-generated addresses to maintain for getwork dynamic address allocation',
         type=int, action='store', default=2, dest='numaddresses')
     parser.add_argument('-t', '--timeaddresses',
-        help='seconds between acquisition of new address and removal of single old (default: 2 days or 172800s)',
-        type=int, action='store', default=172800, dest='timeaddresses')
+        help='seconds between acquisition of new address and removal of single old (default: 4 hours or 14400s)',
+        type=int, action='store', default=14400, dest='timeaddresses')
     parser.add_argument('--datadir',
         help='store data in this directory (default: <directory run_mincoinpool.py is in>/data)',
         type=str, action='store', default=None, dest='datadir')
